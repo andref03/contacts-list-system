@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getContactById, updateContact } from "../services/contactService";
 import ContactForm from "../components/ContactForm";
+import NotificationCard from "../components/NotificationCard";
 
 export default function EditContact() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [initialData, setInitialData] = useState<any>(null);
+    const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
 
     useEffect(() => {
         if (!id) return;
@@ -47,12 +49,23 @@ export default function EditContact() {
                     onSubmit={async (data) => {
                         try {
                             await updateContact(Number(id), data);
-                            navigate("/list");
+                            navigate("/list", { state: { notification: "Contato atualizado com sucesso" } });
                         } catch (err) {
                             console.error(err);
+                            const nid = Date.now();
+                            setNotifications((prev) => [...prev, { id: nid, message: "Erro ao atualizar contato" }]);
+                            setTimeout(() => setNotifications((prev) => prev.filter((n) => n.id !== nid)), 5000);
                         }
                     }}
                 />
+
+                <div className="fixed bottom-4 right-4 w-80 z-50 flex flex-col-reverse gap-2">
+                    {notifications.map((n) => (
+                        <NotificationCard key={n.id}
+                            message={n.message}
+                            onClose={() => setNotifications((prev) => prev.filter(x => x.id !== n.id))} />
+                    ))}
+                </div>
             </div>
         </div>
     );

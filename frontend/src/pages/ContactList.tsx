@@ -51,9 +51,10 @@ export default function ContactList() {
     try {
       setLoading(true);
       await deleteContact(id);
+      setNotifications((prev) => [...prev, { id: Date.now(), message: "Contato excluído com sucesso" }]);
       await load();
     } catch (err: any) {
-      setNotifications((prev) => [...prev, { id: Date.now(), message: "Erro ao excluir" }]);
+      setNotifications((prev) => [...prev, { id: Date.now(), message: "Erro ao excluir contato" }]);
     } finally {
       setLoading(false);
     }
