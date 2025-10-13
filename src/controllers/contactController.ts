@@ -1,10 +1,18 @@
 import type { Request, Response } from "express";
 import * as service from "../services/contactService.js";
+import { formatDateToBR } from "../utils/date.js";
 
 export const getContacts = async (req: Request, res: Response) => {
   try {
     const contacts = await service.getContacts();
-    return res.json(contacts);
+
+    const formattedContacts = contacts.map(c => ({
+      ...c,
+      createdAt: formatDateToBR(new Date(c.createdAt)),
+      updatedAt: formatDateToBR(new Date(c.updatedAt)),
+    }));
+
+    return res.json(formattedContacts);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Erro ao buscar contatos!" });
@@ -18,7 +26,15 @@ export const createContact = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Nome e Email são obrigatórios!" });
     }
     const newContact = await service.createContact({ name, email, phone });
-    return res.status(201).json(newContact);
+
+    const formattedContact = {
+      ...newContact,
+      createdAt: formatDateToBR(new Date(newContact.createdAt)),
+      updatedAt: formatDateToBR(new Date(newContact.updatedAt)),
+    };
+
+    return res.status(201).json(formattedContact);
+
   } catch (err: any) {
     console.error(err);
 
@@ -34,7 +50,15 @@ export const updateContact = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, email, phone } = req.body;
     const updated = await service.updateContact(Number(id), { name, email, phone });
-    return res.json(updated);
+
+    const formattedUpdated = {
+      ...updated,
+      createdAt: formatDateToBR(new Date(updated.createdAt)),
+      updatedAt: formatDateToBR(new Date(updated.updatedAt)),
+    };
+
+    return res.json(formattedUpdated);
+
   } catch (err: any) {
     console.error(err);
     if (err?.code === "P2025") {
