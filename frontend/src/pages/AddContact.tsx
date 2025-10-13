@@ -11,7 +11,7 @@ export default function AddContact() {
             <div className="mt-16 w-full md:max-w-2xl px-4 flex flex-col items-center">
 
                 <button
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/home")}
                     className="mb-6 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
                 >
                     Voltar
@@ -25,7 +25,7 @@ export default function AddContact() {
                     onSubmit={async (data) => {
                         try {
                             await createContact(data);
-                            navigate("/");
+                            navigate("/list");
                         } catch (err) {
                             console.error(err);
                         }

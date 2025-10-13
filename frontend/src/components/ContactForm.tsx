@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ContactFormProps {
   onSubmit: (data: { name: string; email: string; phone?: string }) => void;
 }
 
 export default function ContactForm({ onSubmit }: ContactFormProps) {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -21,7 +24,7 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full max-w-md mx-auto mt-6"> 
+    <form onSubmit={handleSubmit} className="flex flex-col w-full max-w-md mx-auto mt-6">
       <label className="font-medium text-white">Nome *</label>
       <input
         value={name}
@@ -51,10 +54,10 @@ export default function ContactForm({ onSubmit }: ContactFormProps) {
 
       <button
         type="submit"
+        onClick={() => navigate("/list")}
         disabled={!isValid}
-        className={`w-full p-2 rounded font-medium text-white transition ${
-          isValid ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 cursor-not-allowed"
-        }`}
+        className={`w-full p-2 rounded font-medium text-white transition ${isValid ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 cursor-not-allowed"
+          }`}
       >
         Salvar
       </button>

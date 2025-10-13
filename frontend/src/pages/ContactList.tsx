@@ -25,7 +25,7 @@ export default function ContactList() {
   return (
     <div className="w-full min-h-screen bg-gray-900 flex flex-col items-center px-4 py-10">
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="mb-4 p-2 bg-gray-700 text-white rounded hover:bg-gray-600"
       >
         Voltar
