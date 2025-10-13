@@ -1,59 +1,82 @@
+import { useEffect, useState } from "react";
+import { getContacts, createContact } from "./services/contactService";
+
 export default function App() {
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    loadContacts();
+  }, []);
+
+  async function loadContacts() {
+    const res = await getContacts();
+    setContacts(res.data);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await createContact({ name, email, phone });
+    setName("");
+    setEmail("");
+    setPhone("");
+    loadContacts();
+  }
+
   return (
-    <div className="min-h-screen bg-gray-900 flex justify-center items-start px-4 py-10">
-      <main className="w-full max-w-2xl">
-        <h1 className="text-4xl font-semibold text-white mb-6">Cadastrar Contato</h1>
+    <div className="w-full min-h-screen bg-gray-900 flex justify-center px-4">
+      <main className="my-10 w-full md:max-w-2xl">
+        <h1 className="text-4xl font-medium text-white mb-6">Clientes</h1>
 
-        <form className="flex flex-col gap-4 bg-gray-800 p-6 rounded-lg shadow-md">
-          {/* Nome */}
-          <div className="flex flex-col">
-            <label htmlFor="name" className="text-white font-medium mb-1">
-              Nome *
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Digite seu nome..."
-              className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <span className="text-red-500 text-sm mt-1">* indica item obrigatório</span>
-          </div>
+        <form onSubmit={handleSubmit} className="flex flex-col mb-6">
+          <label className="font-medium text-white">Nome *</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            placeholder="Digite seu nome..."
+            className="w-full mb-5 p-2 rounded"
+          />
 
-          {/* Email */}
-          <div className="flex flex-col">
-            <label htmlFor="email" className="text-white font-medium mb-1">
-              Email *
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Digite seu email..."
-              className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <span className="text-red-500 text-sm mt-1">* indica item obrigatório</span>
-          </div>
+          <label className="font-medium text-white">Email *</label>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Digite seu email..."
+            className="w-full mb-5 p-2 rounded"
+          />
 
-          {/* Telefone */}
-          <div className="flex flex-col">
-            <label htmlFor="phone" className="text-white font-medium mb-1">
-              Telefone
-            </label>
-            <input
-              id="phone"
-              type="text"
-              placeholder="(99) 99999-9999"
-              className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
+          <label className="font-medium text-white">Telefone</label>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            type="text"
+            placeholder="(99) 99999-9999"
+            className="w-full mb-5 p-2 rounded"
+          />
 
-          {/* Botão */}
-          <button
+          <input
             type="submit"
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium p-2 rounded transition-colors"
-          >
-            Enviar
-          </button>
+            value="Salvar"
+            className="cursor-pointer w-full p-2 bg-green-500 rounded font-medium hover:bg-green-600 transition text-center"
+          />
         </form>
+
+        <ul className="space-y-2">
+          {contacts.map((c) => (
+            <li
+              key={c.id}
+              className="bg-gray-800 p-3 rounded text-white flex justify-between"
+            >
+              <span>
+                <strong>{c.name}</strong> — {c.email} ({c.phone || "sem telefone"})
+              </span>
+            </li>
+          ))}
+        </ul>
       </main>
     </div>
   );
