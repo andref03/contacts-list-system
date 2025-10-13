@@ -11,7 +11,7 @@ export default function NotificationCard({ message, onClose }: NotificationCardP
         onClick={onClose}
         className="absolute top-0 right-0 mt-1 mr-2 text-green-800 font-bold"
       >
-        X
+        x
       </button>
     </div>
   );
