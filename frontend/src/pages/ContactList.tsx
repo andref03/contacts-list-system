@@ -8,6 +8,9 @@ export default function ContactList() {
   const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
   const [nextId, setNextId] = useState(0);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,6 +47,10 @@ export default function ContactList() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
+  const totalPages = Math.ceil(contacts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentContacts = contacts.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="w-full min-h-screen bg-gray-900 flex flex-col items-center px-4 py-10">
       <button
@@ -56,7 +63,7 @@ export default function ContactList() {
       <h1 className="text-3xl text-white font-bold mb-6">Lista de Contatos</h1>
 
       <ul className="w-full md:max-w-2xl space-y-2">
-        {contacts.map((c) => (
+        {currentContacts.map((c) => (
           <li
             key={c.id}
             className="bg-gray-800 p-3 rounded text-white flex justify-between items-center"
@@ -81,6 +88,32 @@ export default function ContactList() {
           </li>
         ))}
       </ul>
+
+      <div className="flex gap-2 mt-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+          className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50"
+        >
+          Anterior
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+          <button
+            key={p}
+            onClick={() => setCurrentPage(p)}
+            className={`px-3 py-1 rounded ${p === currentPage ? "bg-yellow-500 text-white" : "bg-gray-700 text-white"}`}
+          >
+            {p}
+          </button>
+        ))}
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+          className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50"
+        >
+          Próximo
+        </button>
+      </div>
 
       <div className="fixed bottom-4 right-4 w-80 z-50 flex flex-col-reverse gap-2">
         {notifications.map((n) => (
