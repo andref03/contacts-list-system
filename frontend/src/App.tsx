@@ -6,10 +6,21 @@ export default function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
     loadContacts();
   }, []);
+
+  useEffect(() => {
+    validateForm();
+  }, [name, email]);
+
+  function validateForm() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const valid = name.trim().length > 0 && emailRegex.test(email);
+    setIsValid(valid);
+  }
 
   async function loadContacts() {
     const res = await getContacts();
@@ -18,6 +29,7 @@ export default function App() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isValid) return;
     await createContact({ name, email, phone });
     setName("");
     setEmail("");
@@ -28,24 +40,30 @@ export default function App() {
   return (
     <div className="w-full min-h-screen bg-gray-900 flex justify-center px-4">
       <main className="my-10 w-full md:max-w-2xl">
-        <h1 className="text-4xl font-medium text-white mb-6">Clientes</h1>
+        <h1 className="text-4xl font-medium text-white mb-6">Cadastro de Contatos</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col mb-6">
-          <label className="font-medium text-white">Nome *</label>
+          <p className="text-sm mb-2 text-red-500">* indica item obrigatório</p>
+
+          <label className="font-medium text-white">
+            Nome <span className="text-red-500">*</span>
+          </label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
-            placeholder="Digite seu nome..."
+            placeholder="Insira nome..."
             className="w-full mb-5 p-2 rounded"
           />
 
-          <label className="font-medium text-white">Email *</label>
+          <label className="font-medium text-white">
+            Email <span className="text-red-500">*</span>
+          </label>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
-            placeholder="Digite seu email..."
+            placeholder="Insira email..."
             className="w-full mb-5 p-2 rounded"
           />
 
@@ -61,7 +79,11 @@ export default function App() {
           <input
             type="submit"
             value="Salvar"
-            className="cursor-pointer w-full p-2 bg-green-500 rounded font-medium hover:bg-green-600 transition text-center"
+            disabled={!name || !email}
+            className={`cursor-pointer w-full p-2 rounded font-medium transition text-center ${!name || !email
+                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600 text-white"
+              }`}
           />
         </form>
 
