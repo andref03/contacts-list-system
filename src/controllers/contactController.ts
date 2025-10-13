@@ -18,6 +18,27 @@ export const getContacts = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Erro ao buscar contatos!" });
   }
 };
+export const getContactById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const contact = await service.getContactById(Number(id));
+    if (!contact) {
+      return res.status(404).json({ error: "Contato não encontrado!" });
+    }
+
+    const formattedContact = {
+      ...contact,
+      createdAt: formatDateToBR(new Date(contact.createdAt)),
+      updatedAt: formatDateToBR(new Date(contact.updatedAt)),
+    };
+
+    return res.json(formattedContact);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erro ao buscar contato!" });
+  }
+};
+
 
 export const createContact = async (req: Request, res: Response) => {
   try {

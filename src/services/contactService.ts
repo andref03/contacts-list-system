@@ -7,6 +7,11 @@ export const getContacts = async (): Promise<Contact[]> => {
 	return prisma.contact.findMany();
 };
 
+export const getContactById = async (id: number) => {
+  return prisma.contact.findUnique({ where: { id } });
+};
+
+
 export const createContact = async (data: {
 	name: string;
 	email: string;

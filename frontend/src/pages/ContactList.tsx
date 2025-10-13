@@ -66,8 +66,8 @@ export default function ContactList() {
             </div>
             <div className="space-x-2">
               <button
-                onClick={() => navigate(`/add?edit=${c.id}`)}
-                className="text-bold bg-yellow-500 px-2 py-1 rounded hover:bg-yellow-600"
+                onClick={() => navigate(`/edit/${c.id}`)}
+                className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-400 transition"
               >
                 Editar
               </button>

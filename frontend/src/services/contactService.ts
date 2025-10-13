@@ -8,5 +8,6 @@ export const createContact = (data: { name: string; email: string; phone?: strin
 export const updateContact = (id: number, data: { name: string; email: string; phone?: string }) =>
   api.put(`/contacts/${id}`, data);
 
-export const deleteContact = (id: number) =>
-  api.delete(`/contacts/${id}`);
+export const deleteContact = (id: number) => api.delete(`/contacts/${id}`);
+
+export const getContactById = (id: number) => api.get(`/contacts/${id}`);
