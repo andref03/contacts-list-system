@@ -9,6 +9,7 @@ type ContactFormProps = {
 };
 
 export default function ContactForm({ onSubmit, initialData, submitLabel = "Salvar" }: ContactFormProps) {
+
   const [name, setName] = useState(initialData?.name || "");
   const [email, setEmail] = useState(initialData?.email || "");
   const [phone, setPhone] = useState(initialData?.phone || "");
@@ -18,11 +19,13 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
   const [emailCheckError, setEmailCheckError] = useState<string | null>(null);
   const [phoneError, setPhoneError] = useState("");
 
+  // validação básica de email e telefone (padrão brasileiro)
   const isEmailFormatValid = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email);
   const phoneRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
   const isPhoneValid = phone.trim() === "" || phoneRegex.test(phone);
   const isValid = name.trim() !== "" && isEmailFormatValid && !emailExists && isPhoneValid;
 
+  // inicializa valores caso venha initialData (para edit)
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || "");
@@ -31,6 +34,7 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
     }
   }, [initialData]);
 
+  // validação assíncrona do email para evitar duplicidade
   useEffect(() => {
     let mounted = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -56,20 +60,20 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
         const found = list && list.length ? list[0] : null;
         if (!mounted) return;
         if (found && found.email && found.email.toLowerCase() === email.toLowerCase()) {
-          setEmailExists(true);
+          setEmailExists(true); // email já existente
         } else {
           setEmailExists(false);
         }
       } catch (err: any) {
         if (!mounted) return;
-        setEmailCheckError("Erro ao verificar email");
+        setEmailCheckError("Erro ao verificar email"); // erro na requisição
         setEmailExists(false);
       } finally {
         if (mounted) setCheckingEmail(false);
       }
     }
 
-    timer = setTimeout(checkEmail, 500);
+    timer = setTimeout(checkEmail, 500); // debounce de 500ms pra não chamar a API em cada letra
 
     return () => {
       mounted = false;
@@ -77,6 +81,7 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
     };
   }, [email, initialData]);
 
+  // mantém phone e rawPhone sincronizados caso initialData mude
   useEffect(() => {
     if (initialData?.phone) {
       const digits = initialData.phone.replace(/\D/g, "");
@@ -87,10 +92,11 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid) return;
+    if (!isValid) return; // não submete se inválido
     await onSubmit({ name, email, phone });
   };
 
+  // formata telefone pro padrão brasileiro
   const formatPhone = (value: string) => {
     const raw = value.replace(/\D/g, "");
     const digits = raw.slice(0, 11);
@@ -102,15 +108,17 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
 
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
 
+  // conta qtdd de dígitos em uma string formatada
   const countDigits = (s: string) => (s.match(/\d/g) || []).length;
 
+  // manipula teclas backspace/delete pra manter a máscara do telefone
   const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const el = phoneInputRef.current;
     if (!el) return;
     const selStart = el.selectionStart ?? 0;
     const selEnd = el.selectionEnd ?? 0;
 
-    if (selStart !== selEnd) return;
+    if (selStart !== selEnd) return; // ignora seleção múltipla
 
     const formatted = phone;
 
@@ -177,7 +185,7 @@ export default function ContactForm({ onSubmit, initialData, submitLabel = "Salv
           setPhone(formatPhone(raw));
 
           if (raw.length > 0 && !(raw.length === 11)) {
-            setPhoneError("Número incompleto");
+            setPhoneError("Número incompleto"); // feedback visual de telefone incompleto
           } else {
             setPhoneError("");
           }
