@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { getContacts, deleteContact } from "../services/contactService";
 import { useNavigate, useLocation } from "react-router-dom";
 import NotificationCard from "../components/NotificationCard";
+import ConfirmCard from "../components/ConfirmCard";
 
 type Contact = { id: number; name: string; email: string; phone?: string | null; createdAt?: string; updatedAt?: string };
 
@@ -47,18 +48,27 @@ export default function ContactList() {
   }, [location.state]);
 
   async function handleDelete(id: number) {
-    if (!confirm("Deseja realmente excluir este contato?")) return;
+    setPendingDeleteId(id);
+  }
+
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+
+  const confirmDelete = async () => {
+    if (pendingDeleteId == null) return;
     try {
       setLoading(true);
-      await deleteContact(id);
+      await deleteContact(pendingDeleteId);
       setNotifications((prev) => [...prev, { id: Date.now(), message: "Contato excluído com sucesso" }]);
       await load();
     } catch (err: any) {
       setNotifications((prev) => [...prev, { id: Date.now(), message: "Erro ao excluir contato" }]);
     } finally {
       setLoading(false);
+      setPendingDeleteId(null);
     }
-  }
+  };
+
+  const cancelDelete = () => setPendingDeleteId(null);
 
   const totalPages = Math.max(1, Math.ceil((total || contacts.length) / pageSize));
 
@@ -107,6 +117,14 @@ export default function ContactList() {
           <NotificationCard key={n.id} message={n.message} onClose={() => setNotifications((prev) => prev.filter(x => x.id !== n.id))} />
         ))}
       </div>
+
+      {pendingDeleteId != null && (
+        <ConfirmCard
+          message="Deseja realmente excluir este contato?"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
 
       <button 
       onClick={() => navigate("/add")} 
