@@ -1,6 +1,7 @@
 import { api } from "./api";
 
-export const getContacts = () => api.get("/contacts");
+export const getContacts = (params?: { q?: string; page?: number; pageSize?: number; sort?: string; order?: 'asc'|'desc' }) =>
+  api.get("/contacts", { params });
 
 export const createContact = (data: { name: string; email: string; phone?: string }) =>
   api.post("/contacts", data);

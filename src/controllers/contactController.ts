@@ -4,15 +4,18 @@ import { formatDateToBR } from "../utils/date.js";
 
 export const getContacts = async (req: Request, res: Response) => {
   try {
-    const contacts = await service.getContacts();
+    const { q, page = '1', pageSize = '10', sort, order } = req.query as Record<string, string>;
+    const p = Number(page) || 1;
+    const ps = Number(pageSize) || 10;
+  const result = await service.getContacts({ q: q as any, page: p, pageSize: ps, sort: sort as any, order: order as any } as any);
 
-    const formattedContacts = contacts.map(c => ({
+    const formatted = result.data.map((c: any) => ({
       ...c,
       createdAt: formatDateToBR(new Date(c.createdAt)),
       updatedAt: formatDateToBR(new Date(c.updatedAt)),
     }));
 
-    return res.json(formattedContacts);
+    return res.json({ data: formatted, page: result.page, pageSize: result.pageSize, total: result.total });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Erro ao buscar contatos!" });
