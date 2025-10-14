@@ -1,4 +1,4 @@
-
+# Escolhas de Projeto e Justificativas
 ## Estrutura de páginas do frontend
 
 O sistema foi organizado em páginas separadas por funcionalidade:
@@ -20,7 +20,7 @@ O sistema foi organizado em páginas separadas por funcionalidade:
 
 Esses campos existem apenas no banco de dados e **não são mostrados ao usuário final**.
 
-### Por quê?
+### Justificativa
 
 - servem para controle interno: saber quando o registro foi criado ou modificado  
 - não precisam ser expostos, evitando poluir a interface  
@@ -31,6 +31,8 @@ Esses campos existem apenas no banco de dados e **não são mostrados ao usuári
 ## Formato de Telefone
 
 Atualmente, o sistema utiliza o **padrão brasileiro de telefone**: `(99) 99999-9999`, que já abstrai o código `+55`.  
+
+### Justificativa
 
 - A escolha foi feita para facilitar a validação e formatação automática no frontend.  
 - Garante feedback visual imediato caso o usuário digite um número inválido.  
@@ -71,6 +73,6 @@ A lista de contatos foi gerada com o auxílio de IA, que sugeriu nomes, emails e
 
 ---
 
-## Créditos / Referências
+# Créditos / Referências
 
 Tutorial de frontend inspirado por [Matheus Fraga](https://www.youtube.com/watch?v=JlYrbEBZ3PE) no YouTube.
