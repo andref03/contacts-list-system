@@ -9,6 +9,15 @@ type ContactFormProps = {
   submitLabel?: string;
 };
 
+type ContactFromAPI = {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 // validação Zod
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(50),
@@ -67,16 +76,20 @@ export default function ContactForm({
 
       setCheckingEmail(true);
       setEmailCheckError(null);
+
       try {
         const res = await getContacts({ q: email, page: 1, pageSize: 1 });
-        const list = (res.data.data || res.data) as any[];
+        const list = (res.data.data || res.data) as ContactFromAPI[];
         const found = list?.[0];
         if (!mounted) return;
         setEmailExists(found?.email?.toLowerCase() === email.toLowerCase());
-      } catch {
+      } catch (err: unknown) {
         if (!mounted) return;
         setEmailCheckError('Erro ao verificar email');
         setEmailExists(false);
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
       } finally {
         if (mounted) setCheckingEmail(false);
       }
@@ -203,7 +216,9 @@ export default function ContactForm({
           setName(paste);
           e.preventDefault();
         }}
-        className={`w-full mb-1 p-2 rounded border ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+        className={`w-full mb-1 p-2 rounded border ${
+          errors.name ? 'border-red-500' : 'border-gray-300'
+        }`}
       />
       {errors.name && <div className="text-sm text-red-500 mb-2">{errors.name}</div>}
 
@@ -221,7 +236,9 @@ export default function ContactForm({
           setEmail(paste);
           e.preventDefault();
         }}
-        className={`w-full mb-1 p-2 rounded border ${emailExists || errors.email ? 'border-red-500' : 'border-gray-300'}`}
+        className={`w-full mb-1 p-2 rounded border ${
+          emailExists || errors.email ? 'border-red-500' : 'border-gray-300'
+        }`}
       />
       {checkingEmail && <div className="text-sm text-yellow-300 mb-1">Verificando email...</div>}
       {emailCheckError && <div className="text-sm text-red-400 mb-1">{emailCheckError}</div>}
@@ -242,7 +259,9 @@ export default function ContactForm({
         }}
         type="text"
         placeholder="(99) 99999-9999"
-        className={`w-full mb-1 p-2 rounded border ${phoneError || errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+        className={`w-full mb-1 p-2 rounded border ${
+          phoneError || errors.phone ? 'border-red-500' : 'border-gray-300'
+        }`}
       />
       {phoneError && <div className="text-sm text-red-500 mb-1">{phoneError}</div>}
       {errors.phone && <div className="text-sm text-red-500 mb-1">{errors.phone}</div>}
@@ -250,7 +269,9 @@ export default function ContactForm({
       <button
         type="submit"
         disabled={!isValid}
-        className={`w-full p-2 rounded font-medium text-white transition ${isValid ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 cursor-not-allowed'}`}
+        className={`w-full p-2 rounded font-medium text-white transition ${
+          isValid ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 cursor-not-allowed'
+        }`}
       >
         {submitLabel}
       </button>
