@@ -1,15 +1,47 @@
 import type { Request, Response } from "express";
 import * as service from "../services/contactService.js";
+import { formatDateToBR } from "../utils/date.js";
 
 export const getContacts = async (req: Request, res: Response) => {
   try {
-    const contacts = await service.getContacts();
-    return res.json(contacts);
+    const { q, page = '1', pageSize = '10', sort, order } = req.query as Record<string, string>;
+    const p = Number(page) || 1;
+    const ps = Number(pageSize) || 10;
+  const result = await service.getContacts({ q: q as any, page: p, pageSize: ps, sort: sort as any, order: order as any } as any);
+
+    const formatted = result.data.map((c: any) => ({
+      ...c,
+      createdAt: formatDateToBR(new Date(c.createdAt)),
+      updatedAt: formatDateToBR(new Date(c.updatedAt)),
+    }));
+
+    return res.json({ data: formatted, page: result.page, pageSize: result.pageSize, total: result.total });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Erro ao buscar contatos!" });
   }
 };
+export const getContactById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const contact = await service.getContactById(Number(id));
+    if (!contact) {
+      return res.status(404).json({ error: "Contato não encontrado!" });
+    }
+
+    const formattedContact = {
+      ...contact,
+      createdAt: formatDateToBR(new Date(contact.createdAt)),
+      updatedAt: formatDateToBR(new Date(contact.updatedAt)),
+    };
+
+    return res.json(formattedContact);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erro ao buscar contato!" });
+  }
+};
+
 
 export const createContact = async (req: Request, res: Response) => {
   try {
@@ -18,7 +50,15 @@ export const createContact = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Nome e Email são obrigatórios!" });
     }
     const newContact = await service.createContact({ name, email, phone });
-    return res.status(201).json(newContact);
+
+    const formattedContact = {
+      ...newContact,
+      createdAt: formatDateToBR(new Date(newContact.createdAt)),
+      updatedAt: formatDateToBR(new Date(newContact.updatedAt)),
+    };
+
+    return res.status(201).json(formattedContact);
+
   } catch (err: any) {
     console.error(err);
 
@@ -34,7 +74,15 @@ export const updateContact = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, email, phone } = req.body;
     const updated = await service.updateContact(Number(id), { name, email, phone });
-    return res.json(updated);
+
+    const formattedUpdated = {
+      ...updated,
+      createdAt: formatDateToBR(new Date(updated.createdAt)),
+      updatedAt: formatDateToBR(new Date(updated.updatedAt)),
+    };
+
+    return res.json(formattedUpdated);
+
   } catch (err: any) {
     console.error(err);
     if (err?.code === "P2025") {
