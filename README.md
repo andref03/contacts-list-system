@@ -1,3 +1,8 @@
+# Como executar
+
+Veja as instruções detalhadas em [Como executar](como_executar.md).
+---
+
 # Escolhas de Projeto e Justificativas
 ## Estrutura de páginas do frontend
 
@@ -13,6 +18,17 @@ O sistema foi organizado em páginas separadas por funcionalidade:
 - separação clara de responsabilidades por página facilita manutenção e navegação  
 - mantém o fluxo de usuário simples e previsível  
 - evita sobrecarregar uma única página com múltiplas funções
+
+---
+
+## Testes da API
+
+Todos os endpoints da aplicação foram testados utilizando **Postman**, garantindo que:
+
+- Criação de contatos funciona corretamente.
+- Listagem e paginação de contatos retornam os dados esperados.
+- Edição e exclusão de contatos atualizam o banco de dados corretamente.
+- Validações de email e telefone são aplicadas conforme definido.
 
 ---
 
