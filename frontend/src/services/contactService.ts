@@ -1,10 +1,15 @@
-import { api } from "./api";
+import { api } from './api';
 
-export const getContacts = (params?: { q?: string; page?: number; pageSize?: number; sort?: string; order?: 'asc'|'desc' }) =>
-  api.get("/contacts", { params });
+export const getContacts = (params?: {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+}) => api.get('/contacts', { params });
 
 export const createContact = (data: { name: string; email: string; phone?: string }) =>
-  api.post("/contacts", data);
+  api.post('/contacts', data);
 
 export const updateContact = (id: number, data: { name: string; email: string; phone?: string }) =>
   api.put(`/contacts/${id}`, data);

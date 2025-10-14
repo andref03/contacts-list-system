@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -8,14 +8,14 @@ export default function Home() {
       <h1 className="text-4xl text-white font-bold">Sistema de Contatos</h1>
 
       <button
-        onClick={() => navigate("/add")}
+        onClick={() => navigate('/add')}
         className="w-64 p-3 bg-green-500 text-white rounded hover:bg-green-600 transition"
       >
         Cadastrar novo contato
       </button>
 
       <button
-        onClick={() => navigate("/list")}
+        onClick={() => navigate('/list')}
         className="w-64 p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
       >
         Visualizar contatos

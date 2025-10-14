@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { z } from "zod";
-import { getContacts } from "../services/contactService";
+import React, { useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
+import { getContacts } from '../services/contactService';
 
 type ContactData = { name: string; email: string; phone?: string };
 type ContactFormProps = {
@@ -12,10 +12,7 @@ type ContactFormProps = {
 // validação Zod
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(50),
-  email: z
-    .string()
-    .email()
-    .max(50),
+  email: z.string().email().max(50),
   phone: z
     .string()
     .optional()
@@ -25,16 +22,18 @@ const contactSchema = z.object({
 export default function ContactForm({
   onSubmit,
   initialData,
-  submitLabel = "Salvar",
+  submitLabel = 'Salvar',
 }: ContactFormProps) {
-  const [name, setName] = useState(initialData?.name || "");
-  const [email, setEmail] = useState(initialData?.email || "");
-  const [phone, setPhone] = useState(initialData?.phone || "");
-  const [rawPhone, setRawPhone] = useState(initialData?.phone ? initialData.phone.replace(/\D/g, "") : "");
+  const [name, setName] = useState(initialData?.name || '');
+  const [email, setEmail] = useState(initialData?.email || '');
+  const [phone, setPhone] = useState(initialData?.phone || '');
+  const [rawPhone, setRawPhone] = useState(
+    initialData?.phone ? initialData.phone.replace(/\D/g, '') : '',
+  );
   const [emailExists, setEmailExists] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [emailCheckError, setEmailCheckError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState("");
+  const [phoneError, setPhoneError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
@@ -42,9 +41,9 @@ export default function ContactForm({
   // dados iniciais (edição)
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name || "");
-      setEmail(initialData.email || "");
-      setPhone(initialData.phone || "");
+      setName(initialData.name || '');
+      setEmail(initialData.email || '');
+      setPhone(initialData.phone || '');
     }
   }, [initialData]);
 
@@ -76,7 +75,7 @@ export default function ContactForm({
         setEmailExists(found?.email?.toLowerCase() === email.toLowerCase());
       } catch {
         if (!mounted) return;
-        setEmailCheckError("Erro ao verificar email");
+        setEmailCheckError('Erro ao verificar email');
         setEmailExists(false);
       } finally {
         if (mounted) setCheckingEmail(false);
@@ -94,16 +93,16 @@ export default function ContactForm({
   // formatação inicial do telefone
   useEffect(() => {
     if (initialData?.phone) {
-      const digits = initialData.phone.replace(/\D/g, "");
+      const digits = initialData.phone.replace(/\D/g, '');
       setRawPhone(digits.slice(0, 11));
       setPhone(formatPhone(digits));
     }
   }, [initialData?.phone]);
 
   const formatPhone = (value: string) => {
-    const raw = value.replace(/\D/g, "");
+    const raw = value.replace(/\D/g, '');
     const digits = raw.slice(0, 11);
-    if (digits.length === 0) return "";
+    if (digits.length === 0) return '';
     if (digits.length <= 2) return `(${digits}`;
     if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
@@ -121,7 +120,7 @@ export default function ContactForm({
 
     const formatted = phone;
 
-    if (e.key === "Backspace") {
+    if (e.key === 'Backspace') {
       const charLeft = formatted[selStart - 1];
       if (charLeft && /[^0-9]/.test(charLeft)) {
         e.preventDefault();
@@ -135,7 +134,7 @@ export default function ContactForm({
       }
     }
 
-    if (e.key === "Delete") {
+    if (e.key === 'Delete') {
       const charRight = formatted[selStart];
       if (charRight && /[^0-9]/.test(charRight)) {
         e.preventDefault();
@@ -154,7 +153,7 @@ export default function ContactForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setPhoneError("");
+    setPhoneError('');
 
     const result = contactSchema.safeParse({ name, email, phone });
 
@@ -176,9 +175,9 @@ export default function ContactForm({
   // telefone incompleto
   useEffect(() => {
     if (rawPhone.length > 0 && rawPhone.length < 11) {
-      setPhoneError("Número incompleto");
+      setPhoneError('Número incompleto');
     } else {
-      setPhoneError("");
+      setPhoneError('');
     }
   }, [rawPhone]);
 
@@ -198,33 +197,37 @@ export default function ContactForm({
         type="text"
         placeholder="Ex: João Silva"
         maxLength={50}
-        onChange={(e) => setName(e.target.value.replace(/\n/g, "").slice(0, 50))}
+        onChange={(e) => setName(e.target.value.replace(/\n/g, '').slice(0, 50))}
         onPaste={(e) => {
-          const paste = e.clipboardData.getData("text").replace(/\n/g, "").slice(0, 50);
+          const paste = e.clipboardData.getData('text').replace(/\n/g, '').slice(0, 50);
           setName(paste);
           e.preventDefault();
         }}
-        className={`w-full mb-1 p-2 rounded border ${errors.name ? "border-red-500" : "border-gray-300"}`}
+        className={`w-full mb-1 p-2 rounded border ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
       />
       {errors.name && <div className="text-sm text-red-500 mb-2">{errors.name}</div>}
 
-      <label className={`font-medium text-white ${emailExists ? "text-red-500" : ""}`}>Email *</label>
+      <label className={`font-medium text-white ${emailExists ? 'text-red-500' : ''}`}>
+        Email *
+      </label>
       <input
         value={email}
         type="email"
         placeholder="Ex: joao@email.com"
         maxLength={50}
-        onChange={(e) => setEmail(e.target.value.replace(/\s/g, "").slice(0, 50))}
+        onChange={(e) => setEmail(e.target.value.replace(/\s/g, '').slice(0, 50))}
         onPaste={(e) => {
-          const paste = e.clipboardData.getData("text").replace(/\s/g, "").slice(0, 50);
+          const paste = e.clipboardData.getData('text').replace(/\s/g, '').slice(0, 50);
           setEmail(paste);
           e.preventDefault();
         }}
-        className={`w-full mb-1 p-2 rounded border ${emailExists || errors.email ? "border-red-500" : "border-gray-300"}`}
+        className={`w-full mb-1 p-2 rounded border ${emailExists || errors.email ? 'border-red-500' : 'border-gray-300'}`}
       />
       {checkingEmail && <div className="text-sm text-yellow-300 mb-1">Verificando email...</div>}
       {emailCheckError && <div className="text-sm text-red-400 mb-1">{emailCheckError}</div>}
-      {!checkingEmail && emailExists && <div className="text-sm text-red-500 mb-1">Este email já está em uso.</div>}
+      {!checkingEmail && emailExists && (
+        <div className="text-sm text-red-500 mb-1">Este email já está em uso.</div>
+      )}
       {errors.email && <div className="text-sm text-red-500 mb-2">{errors.email}</div>}
 
       <label className="font-medium text-white">Telefone</label>
@@ -233,13 +236,13 @@ export default function ContactForm({
         value={phone}
         onKeyDown={handlePhoneKeyDown}
         onChange={(e) => {
-          const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+          const raw = e.target.value.replace(/\D/g, '').slice(0, 11);
           setRawPhone(raw);
           setPhone(formatPhone(raw));
         }}
         type="text"
         placeholder="(99) 99999-9999"
-        className={`w-full mb-1 p-2 rounded border ${phoneError || errors.phone ? "border-red-500" : "border-gray-300"}`}
+        className={`w-full mb-1 p-2 rounded border ${phoneError || errors.phone ? 'border-red-500' : 'border-gray-300'}`}
       />
       {phoneError && <div className="text-sm text-red-500 mb-1">{phoneError}</div>}
       {errors.phone && <div className="text-sm text-red-500 mb-1">{errors.phone}</div>}
@@ -247,7 +250,7 @@ export default function ContactForm({
       <button
         type="submit"
         disabled={!isValid}
-        className={`w-full p-2 rounded font-medium text-white transition ${isValid ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 cursor-not-allowed"}`}
+        className={`w-full p-2 rounded font-medium text-white transition ${isValid ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 cursor-not-allowed'}`}
       >
         {submitLabel}
       </button>

@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import AddContact from "./pages/AddContact";
-import EditContact from "./pages/EditContact";
-import ContactList from "./pages/ContactList";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import AddContact from './pages/AddContact';
+import EditContact from './pages/EditContact';
+import ContactList from './pages/ContactList';
 
 export default function App() {
   return (
