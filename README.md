@@ -1,6 +1,6 @@
 # Como executar
 
-Veja as instruções detalhadas em [Como executar](como-executar.md).
+Veja as instruções detalhadas em [Como executar](como_executar.md).
 ---
 
 # Escolhas de Projeto e Justificativas
