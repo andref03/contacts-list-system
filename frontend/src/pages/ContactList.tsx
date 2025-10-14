@@ -13,15 +13,18 @@ type Contact = {
   updatedAt?: string;
 };
 
+type Notification = { id: number; message: string };
+
 export default function ContactList() {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,10 +35,11 @@ export default function ContactList() {
       setError(null);
       try {
         const res = await getContacts({ q, page: p, pageSize });
-        setContacts(res.data.data || res.data || []);
-        setTotal(res.data.total ?? 0);
-      } catch (err: any) {
-        setError(err?.message || 'Erro ao carregar contatos');
+        const list = (res.data.data || res.data) as Contact[];
+        setContacts(list);
+        setTotal(res.data.total ?? list.length);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Erro ao carregar contatos');
         setContacts([]);
       } finally {
         setLoading(false);
@@ -49,19 +53,20 @@ export default function ContactList() {
   }, [load]);
 
   useEffect(() => {
-    if (location.state?.notification) {
+    const notification = location.state?.notification as string | undefined;
+    if (notification) {
       const id = Date.now();
-      setNotifications((prev) => [...prev, { id, message: location.state.notification }]);
-      setTimeout(() => setNotifications((prev) => prev.filter((n) => n.id !== id)), 5000);
+      setNotifications((prev) => [...prev, { id, message: notification }]);
+      const timer = setTimeout(
+        () => setNotifications((prev) => prev.filter((n) => n.id !== id)),
+        5000,
+      );
       navigate(location.pathname, { replace: true, state: {} });
+      return () => clearTimeout(timer);
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
-  async function handleDelete(id: number) {
-    setPendingDeleteId(id);
-  }
-
-  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const handleDelete = (id: number) => setPendingDeleteId(id);
 
   const confirmDelete = async () => {
     if (pendingDeleteId == null) return;
@@ -73,8 +78,9 @@ export default function ContactList() {
         { id: Date.now(), message: 'Contato excluído com sucesso' },
       ]);
       await load();
-    } catch (err: any) {
-      setNotifications((prev) => [...prev, { id: Date.now(), message: 'Erro ao excluir contato' }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao excluir contato';
+      setNotifications((prev) => [...prev, { id: Date.now(), message: msg }]);
     } finally {
       setLoading(false);
       setPendingDeleteId(null);
@@ -107,8 +113,8 @@ export default function ContactList() {
         />
       </div>
 
-      {loading ? <div className="text-white">Carregando...</div> : null}
-      {error ? <div className="text-red-400">{error}</div> : null}
+      {loading && <div className="text-white">Carregando...</div>}
+      {error && <div className="text-red-400">{error}</div>}
 
       <ul className="w-full md:max-w-2xl space-y-2">
         {contacts.map((c) => (
@@ -158,7 +164,9 @@ export default function ContactList() {
               setPage(p);
               load(query, p);
             }}
-            className={`px-3 py-1 rounded ${p === page ? 'bg-yellow-500 text-white' : 'bg-gray-700 text-white'}`}
+            className={`px-3 py-1 rounded ${
+              p === page ? 'bg-yellow-500 text-white' : 'bg-gray-700 text-white'
+            }`}
           >
             {p}
           </button>
@@ -198,7 +206,7 @@ export default function ContactList() {
 
       <button
         onClick={() => navigate('/add')}
-        className="p-3 my-6  bg-green-500 text-white rounded hover:bg-green-600 transition"
+        className="p-3 my-6 bg-green-500 text-white rounded hover:bg-green-600 transition"
       >
         Cadastrar novo contato
       </button>
