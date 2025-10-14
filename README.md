@@ -1,3 +1,8 @@
+# Como executar
+
+Veja as instruções detalhadas em [Como executar](como-executar.md).
+---
+
 # Escolhas de Projeto e Justificativas
 ## Estrutura de páginas do frontend
 
