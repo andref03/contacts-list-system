@@ -16,6 +16,17 @@ O sistema foi organizado em páginas separadas por funcionalidade:
 
 ---
 
+## Testes da API
+
+Todos os endpoints da aplicação foram testados utilizando **Postman**, garantindo que:
+
+- Criação de contatos funciona corretamente.
+- Listagem e paginação de contatos retornam os dados esperados.
+- Edição e exclusão de contatos atualizam o banco de dados corretamente.
+- Validações de email e telefone são aplicadas conforme definido.
+
+---
+
 ## Campos `createdAt` e `updatedAt`
 
 Esses campos existem apenas no banco de dados e **não são mostrados ao usuário final**.
