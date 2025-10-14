@@ -4,24 +4,44 @@ import { getContactById, updateContact } from '../services/contactService';
 import ContactForm from '../components/ContactForm';
 import NotificationCard from '../components/NotificationCard';
 
+export type Contact = {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type ContactData = {
+  name: string;
+  email: string;
+  phone?: string;
+};
+
+type Notification = { id: number; message: string };
+
 export default function EditContact() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [initialData, setInitialData] = useState<any>(null);
-  const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
+  const [initialData, setInitialData] = useState<Contact | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     if (!id) return;
+
     async function fetchContact() {
       try {
         const res = await getContactById(Number(id));
-        setInitialData(res.data);
-      } catch (err) {
-        console.error(err);
+        setInitialData(res.data as Contact);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Erro ao buscar contato';
+        console.error(msg);
         alert('Contato não encontrado!');
         navigate('/list');
       }
     }
+
     fetchContact();
   }, [id, navigate]);
 
@@ -42,18 +62,21 @@ export default function EditContact() {
         <h1 className="text-3xl text-white font-bold mb-3 text-center">Editar Contato</h1>
 
         <ContactForm
-          initialData={initialData}
-          onSubmit={async (data) => {
+          initialData={{
+            name: initialData.name,
+            email: initialData.email,
+            phone: initialData.phone ?? undefined, // converte null para undefined
+          }}
+          onSubmit={async (data: ContactData) => {
             try {
               await updateContact(Number(id), data);
               navigate('/list', { state: { notification: 'Contato atualizado com sucesso' } });
-            } catch (err) {
-              console.error(err);
+            } catch (err: unknown) {
+              const msg = err instanceof Error ? err.message : 'Erro ao atualizar contato';
+              console.error(msg);
+
               const nid = Date.now();
-              setNotifications((prev) => [
-                ...prev,
-                { id: nid, message: 'Erro ao atualizar contato' },
-              ]);
+              setNotifications((prev) => [...prev, { id: nid, message: msg }]);
               setTimeout(() => setNotifications((prev) => prev.filter((n) => n.id !== nid)), 5000);
             }
           }}
