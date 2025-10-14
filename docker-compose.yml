@@ -9,7 +9,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
 
   backend:
     build: .
@@ -20,17 +20,17 @@ services:
     depends_on:
       - db
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./:/usr/src/app
-    command: ["sh", "-c", "npm run dev"]
+    command: ['sh', '-c', 'npm run dev']
 
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
     ports:
-      - "5173:4173"
+      - '5173:4173'
     depends_on:
       - backend
 

@@ -33,6 +33,7 @@ docker compose up --build
 ```
 
 Serviços iniciados (padrão no `docker-compose.yml` que acompanha o repositório):
+
 - db (Postgres) — mapeado para a porta 5432 no host
 - backend (API) — mapeado para a porta 3000 no host
 - frontend (build estático servido) — mapeado para a porta 4173
@@ -130,6 +131,7 @@ Vite irá informar a URL local (geralmente http://localhost:5173 ou similar).
 ## 4) Acessar o banco com DBeaver
 
 Dados de conexão (padrão docker-compose):
+
 - Host: localhost
 - Porta: 5432
 - Database: contacts_db
@@ -139,6 +141,7 @@ Dados de conexão (padrão docker-compose):
 No DBeaver: Database -> New Database Connection -> PostgreSQL -> preencher os campos -> Test Connection -> Finish
 
 Dicas se houver erro de conexão:
+
 - Confirme que o container db está `Up` (`docker compose ps`)
 - Verifique logs do db: `docker compose logs -f db`
 - Se a senha foi alterada, recrie o volume (perigoso, apaga dados): `docker compose down -v` e `docker compose up --build`
