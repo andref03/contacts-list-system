@@ -102,6 +102,10 @@ Após a geração por IA, todo o conteúdo foi submetido a um checklist:
 
 - **Corretude:** Validação da lógica de negócio e funcionalidade.
 
-## Nota sobre este documento
+# Nota sobre este documento
 
 Este guia foi revisado e otimizado com o auxílio de Inteligência Artificial para garantir clareza e concisão.
+
+# Créditos / Referências
+
+- Tutorial de frontend inspirado por [Matheus Fraga](https://www.youtube.com/watch?v=JlYrbEBZ3PE) no YouTube.
