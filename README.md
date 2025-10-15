@@ -1,99 +1,107 @@
-# Como executar
+# README do Projeto
 
-## Veja as instruções detalhadas em [Como executar](como_executar.md).
+Este README apresenta as escolhas de projeto, justificativas e considerações de engenharia para a aplicação, além de documentar o uso de Inteligência Artificial no processo de desenvolvimento.
 
-# Escolhas de Projeto e Justificativas
+## 🚀 Como Executar
 
-## Estrutura de páginas do frontend
+Para instruções detalhadas sobre como executar o projeto, consulte [Como executar](como_executar.md).
 
-O sistema foi organizado em páginas separadas por funcionalidade:
+## 💡 Escolhas de Projeto e Justificativas
 
-- **/home:** página inicial com dois botões principais — "Cadastrar novo contato" e "Visualizar contatos" — para direcionar o usuário rapidamente.
-- **/list:** página exclusiva para visualizar todos os contatos, com paginação e ações de editar/excluir.
-- **/add:** página dedicada para criar um novo contato, mantendo o formulário limpo e focado.
-- **/edit:** página dedicada para editar um contato existente, reutilizando o mesmo formulário da criação, mas preenchido com os dados atuais.
+### Estrutura de Páginas do Frontend
 
-### Justificativa
+O frontend é organizado em páginas dedicadas para cada funcionalidade (`/home`, `/list`, `/add`, `/edit`), promovendo **separação de responsabilidades**, **facilidade de manutenção** e **navegação intuitiva**.
 
-- separação clara de responsabilidades por página facilita manutenção e navegação
-- mantém o fluxo de usuário simples e previsível
-- evita sobrecarregar uma única página com múltiplas funções
+### Validação e Formulários: Zod
+
+Uso do **Zod** para validação de dados devido à sua **integração nativa com TypeScript**, **geração automática de tipos** a partir de schemas e **API simples**, garantindo consistência e reduzindo erros.
+
+### Banco de Dados: Prisma
+
+**Prisma** foi escolhido como ORM por ser **moderno**, oferecer **tipagem automática**, **autocompletar**, **migrações simplificadas** e **melhor integração com TypeScript** em comparação a alternativas como Knex ou TypeORM.
+
+### Campos `createdAt` e `updatedAt`
+
+Estes campos são para **controle interno** no banco de dados e **não são expostos ao usuário final**, evitando poluir a interface e garantindo o registro automático de criação e modificação.
+
+### Formato de Telefone
+
+O sistema adota o **padrão brasileiro de telefone** `(99) 99999-9999` para **facilitar validação e formatação automática** no frontend. Para aceitar números internacionais, seria necessário remover ou adaptar a regex de validação e a função de formatação.
+
+## ⚙️ Spec Engineering
+
+Esta seção detalha as assunções e decisões de projeto.
+
+### Assunções Explícitas
+
+- **Paginação Padrão:** A paginação segue um modelo `page` e `pageSize` simples, com `pageSize` padrão de 10.
+
+- **Formato de Telefone:** O formato `(99) 99999-9999` é o único aceito para validação inicial, abstraindo o código `+55`.
+
+- **Unicidade de Email:** Emails são únicos por contato, garantindo que cada usuário tenha um identificador exclusivo.
+
+### Decisões de Arquitetura
+
+- **Decisão:** Usar Prisma para ORM.
+  - **Alternativas:** Knex, TypeORM.
+  - **Motivo:** Tipagem forte, autocompletar, migrações automáticas e melhor integração com TypeScript moderno.
+  - **Consequência:** Menor flexibilidade para queries SQL raw complexas, mas ganho significativo em produtividade e segurança de tipos.
+
+- **Decisão:** Usar Zod para validação de dados.
+  - **Alternativas:** Yup.
+  - **Motivo:** Integração total com TypeScript, geração de tipos a partir de schemas, API concisa.
+  - **Consequência:** Curva de aprendizado inicial para quem não está familiarizado com a sintaxe de schemas, mas ganho em robustez e consistência.
+
+## 🌐 Context Engineering
+
+Considerações sobre escalabilidade, confiabilidade e evolução do sistema.
+
+### Escalabilidade: E se houver 1 milhão de contatos?
+
+- **Problema Potencial:** Consultas de listagem simples podem ficar lentas à medida que o volume de dados cresce.
+
+- **Estratégias:**
+  - **Indexação:** Criar índices no banco de dados para campos de busca (nome, email).
+  - **Cache:** Implementar cache em memória (Redis) pra consultas frequentes.
+  - **Paginação Eficiente:** A paginação atual já ajuda, mas para volumes muito grandes, pode-se pensar em usar `keyset pagination`.
+  - **Particionamento:** Avaliar particionamento de dados para bancos de dados massivos.
+
+## 🧠 Prompt Engineering
+
+O desenvolvimento deste projeto contou com o auxílio de Inteligência Artificial (IA) como copiloto, acelerando diversas etapas.
+
+### Como a IA foi utilizada
+
+- **Geração de Schema:** A IA foi utilizada para gerar o conteúdo inicial do arquivo `prisma/schema.prisma`, que foi posteriormente revisado e ajustado manualmente.
+
+- **Geração de Seed:** A lista de contatos fictícios para popular o banco de dados (`seed`) foi gerada com o auxílio da IA, que sugeriu nomes, emails e números de telefone. Todo o conteúdo foi revisado para garantir a adequação.
+
+- **Auxílio em Testes e Validações:** A IA ajudou a compreender conceitos de validação, paginação e CRUD, além de sugerir padrões de tipagem TypeScript e exemplos de chamadas API para testes.
 
 ---
 
-## Testes da API
+### Prompts 
 
-Todos os endpoints da aplicação foram testados utilizando **Postman**, garantindo que:
-
-- Criação de contatos funciona corretamente.
-- Listagem e paginação de contatos retornam os dados esperados.
-- Edição e exclusão de contatos atualizam o banco de dados corretamente.
-- Validações de email e telefone são aplicadas conforme definido.
-
----
-
-## Campos `createdAt` e `updatedAt`
-
-Esses campos existem apenas no banco de dados e **não são mostrados ao usuário final**.
-
-### Justificativa
-
-- servem para controle interno: saber quando o registro foi criado ou modificado
-- não precisam ser expostos, evitando poluir a interface
-- são atualizados automaticamente pelo backend em todas as operações de CRUD
-
----
-
-## Formato de Telefone
-
-Atualmente, o sistema utiliza o **padrão brasileiro de telefone**: `(99) 99999-9999`, que já abstrai o código `+55`.
-
-### Justificativa
-
-- A escolha foi feita para facilitar a validação e formatação automática no frontend.
-- Garante feedback visual imediato caso o usuário digite um número inválido.
-- Simplifica a lógica de máscara e validação.
-
-### Aceitando números internacionais
-
-Para permitir qualquer padrão de telefone:
-
-1. Remover ou substituir a regex de validação:
-
-```ts
-const phoneRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
+```
+"Gere um schema Prisma para uma entidade 'Contact' com campos para id, nome, email (único), telefone e timestamps (createdAt e updatedAt) de criação e atualização."
 ```
 
-2. Remover ou adaptar a função de formatação:
-
-```ts
-const formatPhone = (value: string) => { ... };
+```
+"Gere um seed.ts com 10 contatos fictícios para Prisma, cada um com nome, email único e telefone opcional no formato brasileiro."
 ```
 
-3. Remover a verificação de quantidade de dígitos:
+### Checklist de Revisão Manual
 
-```ts
-if (raw.length > 0 && !(raw.length === 11)) {
-  setPhoneError('Número incompleto');
-}
-```
+Após a geração por IA, todo o conteúdo foi submetido a um checklist:
 
-Com essas alterações, o campo de telefone aceitará qualquer sequência de números, símbolos ou sinais (+, espaços, hífen etc.). A validação passa a ser opcional, e a responsabilidade de digitação correta fica com o usuário ou com o backend.
+- **Tipagem:** Verificação da corretude e consistência dos tipos TypeScript.
 
----
+- **Segurança:** Análise de vulnerabilidades e boas práticas de segurança.
 
-## Documentando o uso de Inteligência Artificial
+- **Erros:** Teste de cenários de erro e tratamento adequado.
 
-### Geração do schema
+- **Corretude:** Validação da lógica de negócio e funcionalidade.
 
-A IA foi utilizada para gerar o conteúdo do arquivo `prisma/schema.prisma`, o qual foi verificado posteriormente para garantir corretude.
+## Nota sobre este documento
 
-### Geração de seed
-
-A lista de contatos foi gerada com o auxílio de IA, que sugeriu nomes, emails e números de telefone fictícios. Todo o conteúdo gerado foi revisado.
-
----
-
-# Créditos / Referências
-
-Tutorial de frontend inspirado por [Matheus Fraga](https://www.youtube.com/watch?v=JlYrbEBZ3PE) no YouTube.
+Este guia foi revisado e otimizado com o auxílio de Inteligência Artificial para garantir clareza e concisão.
